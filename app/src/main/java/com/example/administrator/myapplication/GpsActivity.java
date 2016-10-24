@@ -53,8 +53,6 @@ public class GpsActivity extends AppCompatActivity {
         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
 
-//        Log.d(TAG, "onCreate: ");
-
         mapList = new ArrayList<Map<String, Object>>();
         adapter = new SimpleAdapter(this,mapList,R.layout.location_item,new String[]{"identifier"},new int[]{R.id.location_identifier});
         gridView = (GridView) findViewById(R.id.gridview4location);
@@ -89,7 +87,7 @@ public class GpsActivity extends AppCompatActivity {
         btn_loacte.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
                 if (location!=null) {
                     Map<String, Object> map = new HashMap<String, Object>();
                     StringBuilder sb = new StringBuilder();
@@ -109,10 +107,6 @@ public class GpsActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
-//        LocationProvider locationProvider  = locationManager.getProvider(LocationManager.GPS_PROVIDER);
 
 
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 2, new LocationListener() {
@@ -154,11 +148,6 @@ public class GpsActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.location_activity_menu,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -168,19 +157,6 @@ public class GpsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-//
-//    public void updateView(Location location){
-//        if (location!=null){
-//            StringBuilder sb = new StringBuilder();
-//            sb.append("longitude: ");
-//            sb.append(location.getLatitude());
-//            longitude.setText(sb.toString());
-//            sb=new StringBuilder();
-//            sb.append("latitude: ");
-//            sb.append(location.getLatitude());
-//            latitude.setText(sb.toString());
-//        }
-//    }
 
 
 }

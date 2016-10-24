@@ -1,8 +1,11 @@
 package com.example.administrator.myapplication;
 
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,7 +30,8 @@ public class DataActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         btn_gps_status=true;
 
         btn_gps = (Button) findViewById(R.id.btn_gps);
@@ -56,13 +60,13 @@ public class DataActivity extends AppCompatActivity {
                 btn_gps_status=!btn_gps_status;
                 if(btn_gps_status){
                     btn_gps.setBackground(getResources().getDrawable(R.drawable.ic_location_on_black_24dp));
-                    Toast.makeText(getApplicationContext(),"loaction on",Toast.LENGTH_SHORT);
+                    Toast.makeText(getApplicationContext(),"turn loaction on",Toast.LENGTH_SHORT).show();
                 }
                 else {
                     btn_gps.setBackground(getResources().getDrawable(R.drawable.ic_location_off_black_24dp));
-                    Toast.makeText(getApplicationContext(),"loaction off",Toast.LENGTH_SHORT);
+                    Toast.makeText(getApplicationContext(),"turn loaction off",Toast.LENGTH_SHORT).show();
                 }
-                return false;
+                return true;
             }
         });
 
@@ -92,6 +96,7 @@ public class DataActivity extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     public void onBackPressed() {

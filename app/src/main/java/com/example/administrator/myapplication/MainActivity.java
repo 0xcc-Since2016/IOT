@@ -49,14 +49,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 //deal with the register event
             }
-        }).show();
+        }).setCancelable(false).show();
 
 
         listView = (ListView) findViewById(R.id.item_list);
         mapList = new ArrayList<Map<String, Object>>();
         btn_add = (Button) findViewById(R.id.add_but);
 
-//        getSupportActionBar().setTitle("InstRecord");
 
         adapter = new SimpleAdapter(this,mapList,R.layout.item_layout,new String[]{"title","date"},
                 new int[]{R.id.title,R.id.date});
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("position",position);
                 intent.putExtra("title",title.getText().toString());
                 intent.putExtra("resource_id",id);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 Log.d(TAG, "onItemClick:     "+id);
                 startActivityForResult(intent,0);
             }

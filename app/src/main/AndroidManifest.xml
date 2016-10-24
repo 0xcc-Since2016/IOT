@@ -22,10 +22,7 @@
         <activity android:name=".SoundActivity" />
         <activity android:name=".PictureActivity" />
         <activity
-            android:name=".DataActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".SinglePictureActivity"></activity>
+            android:name=".DataActivity" />
     </application>
 
 </manifest>

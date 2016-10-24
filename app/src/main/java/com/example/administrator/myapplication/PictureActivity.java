@@ -30,7 +30,6 @@ public class PictureActivity extends AppCompatActivity  {
     Button capture;
     GridView gridView;
     List<Bitmap> imagelist;
-//    SimpleAdapter adapter;
     GridViewAdapter adapter;
     int choose_item_position;
     @Override
@@ -49,9 +48,7 @@ public class PictureActivity extends AppCompatActivity  {
 
         gridView = (GridView) findViewById(R.id.gridview4picture);
         imagelist = new ArrayList<Bitmap>();
-//        adapter = new SimpleAdapter(this,imagelist,R.layout.image_item,new String[]{"image"},new int[]{R.id.imageView});
         adapter = new GridViewAdapter(this,R.layout.image_item,imagelist);
-//        initializeGridview(gridView);
         gridView.setAdapter(adapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -74,40 +71,6 @@ public class PictureActivity extends AppCompatActivity  {
         });
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.picture_activity_menu,menu);
-//        return super.onCreateOptionsMenu(menu);
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()){
-//            case R.id.add_picture:
-//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(intent,0);
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
-//    private void initializeGridview(GridView gridView){
-////        List<Map<String,Object>> imagelist = new ArrayList<Map<String, Object>>();
-//        Map<String,Object> map = new HashMap<String, Object>();
-//        map.put("image",R.drawable.add_icon);
-//        imagelist.add(map);
-//        adapter.notifyDataSetChanged();
-//        gridView.setAdapter(adapter);
-//    }
-
-
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()){
-//            case R.id.btn_capture:
-//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(intent,0);
-//        }
-//    }
 
     private void delete_item(){
         new AlertDialog.Builder(this).setTitle("Are you 确定").setMessage("是否删除这个项目？").setPositiveButton("删除", new DialogInterface.OnClickListener() {
@@ -131,7 +94,6 @@ public class PictureActivity extends AppCompatActivity  {
             if(resultCode == Activity.RESULT_OK){
                 Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                 Map<String , Object> map = new HashMap<String, Object>();
-//                map.put("image",R.drawable.add_icon);
                 imagelist.add(bitmap);
                 adapter.notifyDataSetChanged();
             }
