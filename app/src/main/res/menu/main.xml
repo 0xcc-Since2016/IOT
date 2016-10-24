@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item android:title="backup"
+        android:id="@+id/backup"
+        android:icon="@drawable/ic_backup_black_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:title="download"
+        android:id="@+id/download"
+        android:icon="@drawable/ic_cloud_download_black_24dp"
+        app:showAsAction="never" />
+    <item android:title="change password"
+        android:id="@+id/change_passwd"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_vpn_key_black_24dp" />
+    <item android:title="logout"
+        android:id="@+id/log_out"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_exit_to_app_black_24dp" />
+
+</menu>
