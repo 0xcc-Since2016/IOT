@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dialog_login.hide();
-                showProgressDialog("正在登陆。。。");
+                showProgressDialog("正在登陆");
                 Connector conn = new Connector(Username.getText().toString(), Password.getText().toString());
                 if(conn.Check_login()){
                     Log.d("Login-Msg", "LoginSucceed");
@@ -171,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
                 dialog_register.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dialog_register.dismiss();
+                        // TODO: 2016/10/31  
+                        //dialog_register.dismiss();
 
                     }
                 });
@@ -179,8 +180,9 @@ public class MainActivity extends AppCompatActivity {
                 dialog_register.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dialog_register.dismiss();
-                        dialog_login.show();
+                        // TODO: 2016/10/31  
+                        //dialog_register.dismiss();
+                        //dialog_login.show();
                     }
                 });
             }
