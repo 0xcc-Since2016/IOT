@@ -5,12 +5,15 @@ package com.example.administrator.myapplication;
  */
 
 //Import Http Libs.
+import android.util.Log;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
+import android.util.Log;
 
 public class Connector {
 
@@ -24,8 +27,8 @@ public class Connector {
     public Connector(String user, String pass){
 
         //Set User and Pass
-        username = "username=" + user;
-        password = "password=" + pass;
+        username = "uname=" + user;
+        password = "upwd=" + pass;
 
     }
 
@@ -128,7 +131,9 @@ public class Connector {
     public boolean Check_login(){
 
         String ret = HttpLogin();
-        if(ret == "OK"){
+        ret = ret.trim();
+        if(ret.equals("OK")){
+            Log.d("Ret-MSG",ret);
             return true;
         }
         else{

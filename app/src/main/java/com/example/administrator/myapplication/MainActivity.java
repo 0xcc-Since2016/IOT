@@ -61,20 +61,21 @@ public class MainActivity extends AppCompatActivity {
                         //deal with the login event
 
 
-
                                 Connector conn = new Connector(Username.getText().toString(), Password.getText().toString());
                             if(conn.Check_login()){
+                                Log.d("Login-Msg", "LoginSucceed");
                                     Toast.makeText(getApplicationContext(),"Login Succeed.",Toast.LENGTH_SHORT).show();
                                 }else {
                             //Bounce a dialog and exit app.
-                                new AlertDialog.Builder(MainActivity.this).setTitle("系统提示").setMessage("登录失败").setPositiveButton("确定",new DialogInterface.OnClickListener(){
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which){
-                                        //Exit app.
-                                        return;
-                                    }
-                                });
+                                Log.d("Login-Msg", "LoginFailed");
+                                Toast.makeText(getApplicationContext(),"Login Failed.",Toast.LENGTH_SHORT).show();
+                                try{
+                                Thread.sleep(1000);
+                                }
+                                catch(Exception e){e.printStackTrace();}
+                                finally{
+                                    System.exit(0);
+                                }
                         }
                     }
                 }
