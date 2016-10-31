@@ -73,6 +73,7 @@ public class SoundActivity extends AppCompatActivity {
 
         record.setOnTouchListener(new View.OnTouchListener() {
             @Override
+            //Start Record here when Touch DOWN Recording Start.
             public boolean onTouch(View v, MotionEvent event) {
                 if(event.getAction()==MotionEvent.ACTION_DOWN){
                     try {
@@ -89,16 +90,25 @@ public class SoundActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+
+                //Finish Record when Touch UP , Recording finish.
+                //Need to add a constraint to ensure ACTION_UP is ahead of ACTION_Down.
+
                 else if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(mediaRecorder!=null){
-                        mediaRecorder.stop();
-                        mediaRecorder.release();
-                        mediaRecorder=null;
-                        Toast.makeText(getApplicationContext(),"stop record!",Toast.LENGTH_SHORT).show();
-                        Map<String,Object> map = new HashMap<String, Object>();
-                        map.put("identifier",file.getAbsolutePath());
-                        mapList.add(map);
-                        adapter.notifyDataSetChanged();
+                    try {
+                        if (mediaRecorder != null) {
+                            mediaRecorder.stop();
+                            mediaRecorder.release();
+                            mediaRecorder = null;
+                            Toast.makeText(getApplicationContext(), "stop record!", Toast.LENGTH_SHORT).show();
+                            Map<String, Object> map = new HashMap<String, Object>();
+                            map.put("identifier", file.getAbsolutePath());
+                            mapList.add(map);
+                            adapter.notifyDataSetChanged();
+                        }
+                    } catch(Exception e){
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "stop record!", Toast.LENGTH_SHORT).show();
                     }
                 }
                 return true;

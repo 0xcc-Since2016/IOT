@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,6 +17,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.os.StrictMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,22 +37,59 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        new AlertDialog.Builder(this).setTitle("用户登录").setView(R.layout.login_dialog).setPositiveButton(
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads().detectDiskWrites().detectNetwork()
+                .penaltyLog().build());
+        LayoutInflater inflater = getLayoutInflater();
+        final View v = inflater.inflate(R.layout.login_dialog, null);
+        //LET render login page first
+        new AlertDialog.Builder(this).setTitle("用户登录").setView(v).setPositiveButton(
                 "登录", new DialogInterface.OnClickListener() {
+                    //Because Cannot Acquire View handler directly
+                    //So ReInit a view and set it points to target view.
+                    //Duplicate here!
+
+                    EditText Username = (EditText)v.findViewById(R.id.Username);
+                    EditText Password = (EditText)v.findViewById(R.id.Password);
+
+
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //deal with the login event
+
+
+
+                                Connector conn = new Connector(Username.getText().toString(), Password.getText().toString());
+                            if(conn.Check_login()){
+                                    Toast.makeText(getApplicationContext(),"Login Succeed.",Toast.LENGTH_SHORT).show();
+                                }else {
+                            //Bounce a dialog and exit app.
+                                new AlertDialog.Builder(MainActivity.this).setTitle("系统提示").setMessage("登录失败").setPositiveButton("确定",new DialogInterface.OnClickListener(){
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which){
+                                        //Exit app.
+                                        return;
+                                    }
+                                });
+                        }
                     }
                 }
+
         ).setNegativeButton("注册", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //deal with the register event
             }
         }).setCancelable(false).show();
+
+
+        //INIT init thread
+        InitThread Initth = new InitThread();
+        Initth.start();
 
 
         listView = (ListView) findViewById(R.id.item_list);
@@ -136,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 }
         }
     }
+
 
     private void updateView(int position,String new_title,String new_date){
         Map<String,Object> map;

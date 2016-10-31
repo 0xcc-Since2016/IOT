@@ -10,10 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import android.util.Log;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-
 
 
 public class DataActivity extends AppCompatActivity {
@@ -21,10 +20,13 @@ public class DataActivity extends AppCompatActivity {
     Button btn_gps;
     Button btn_sound;
     Button btn_picture;
+    Button btn_store;
     boolean btn_gps_status;
 
     EditText content;
     EditText title;
+
+    private static final String ACTIVITY_TAG = "[*] ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +36,10 @@ public class DataActivity extends AppCompatActivity {
 //        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         btn_gps_status=true;
 
-        btn_gps = (Button) findViewById(R.id.btn_gps);
-        btn_sound = (Button) findViewById(R.id.btn_sound);
+        btn_gps     = (Button) findViewById(R.id.btn_gps);
+        btn_sound   = (Button) findViewById(R.id.btn_sound);
         btn_picture = (Button) findViewById(R.id.btn_picture);
+        btn_store   = (Button) findViewById(R.id.Str_Btn);
         content = (EditText) findViewById(R.id.content);
         title = (EditText) findViewById((R.id.title));
 
@@ -95,9 +98,35 @@ public class DataActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //Store Information Test
+        btn_store.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v){
+
+                DataStore strdata = new DataStore();
+                //Get Title
+                byte[] Title    = title.getText().toString().getBytes();
+                byte[] Content  = content.getText().toString().getBytes();
+                String notify   = "";
+                //Write-in twice Separately , title and content.
+                try {
+                    strdata.saveToFile(Title, "/data/data/com.example.administrator.myapplication/testFile.txt");
+                    strdata.saveToFile(Content, "/data/data/com.example.administrator.myapplication/testFile.txt");
+                    notify = "File Save Succeed.";
+                } catch(Exception e){
+                    Log.v(DataActivity.ACTIVITY_TAG,e.toString());
+                    notify = "File Save Failed.";
+                }
+                Toast.makeText(getApplicationContext(),notify,Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 
+    //Return to previous page when clicked.
     @Override
     public void onBackPressed() {
         String text = title.getText().toString();

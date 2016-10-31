@@ -61,16 +61,27 @@
 
     </LinearLayout>
 
+    <Button
+        android:text="Store"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_layout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="28dp"
+        android:id="@+id/Str_Btn" />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btn_layout"
         android:inputType="textMultiLine"
-        android:layout_below="@id/title"
-        android:layout_centerHorizontal="true"
         android:gravity="top"
         android:hint="content"
         android:background="@null"
-        android:id="@+id/content" />
+        android:id="@+id/content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/title"
+        android:layout_alignBottom="@+id/Str_Btn" />
 
 </RelativeLayout>
