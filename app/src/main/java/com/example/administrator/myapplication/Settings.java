@@ -12,15 +12,19 @@ package com.example.administrator.myapplication;
 public class Settings {
 
     //Basic Settings
-    public static String folder    = "/data/data/com.example.administrator.myapplication";
-    public static String Server_ip = "127.0.0.1";
-    public static int Server_port  = 80;
+    public static String folder         = "/data/data/com.example.administrator.myapplication";
+    public static String label_file     = "/Label.txt";
+    public static String Server_ip      = "192.168.191.2";
+    public static int    Server_port    = 3000; //Server Listen port 3000 by Default.
 
     //Folder Names
     public static String pic_folder     = "/pic";
     public static String video_folder   = "/video";
     public static String soundrec_folder= "/record";
     public static String database_folder= "/databases";
+
+    //Store Setttings
+    public static String label          = folder + "/labels/";
 
     //SQLite Settings
     public static String db_name        = "INSTREC.db";
@@ -43,7 +47,9 @@ public class Settings {
 
     //Remote Server Settings
     public static String sec_token      = "amRrMS44MA==";
-    public static String login_url      = "http://192.168.1.105:3000/login";
+    public static String login_url      = "http://" + Server_ip + ":" + Server_port + "/login";
     public static String defaultMethod  = "POST";
+    public static String register_url   = "http://" + Server_ip + ":" + Server_port + "/register";
+    public static String upload_url     = "http://" + Server_ip + ":" + Server_port + "/uploaded";
 
 }

@@ -1,6 +1,7 @@
 package com.example.administrator.myapplication;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
  * Created by wand on 2016/10/27.
@@ -24,14 +25,17 @@ public class SqlConnector {
 
     //Init Each Table If they're not present.
     public void InitTables(){
-
-        db_opt.execSQL(Settings.create_user);
-        db_opt.execSQL(Settings.create_gps);
-        db_opt.execSQL(Settings.create_pic);
-        db_opt.execSQL(Settings.create_voice);
-
+        try {
+            db_opt.execSQL(Settings.create_user);
+            db_opt.execSQL(Settings.create_gps);
+            db_opt.execSQL(Settings.create_pic);
+            db_opt.execSQL(Settings.create_voice);
+        }catch(Exception e){
+            Log.d("[*]Exec_CreateTblError", e.toString());
+        }
+        finally {
+            db_opt.close();
+        }
     }
-
-
 
 }

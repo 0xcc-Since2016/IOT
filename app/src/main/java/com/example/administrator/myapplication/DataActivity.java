@@ -106,14 +106,18 @@ public class DataActivity extends AppCompatActivity {
             public void onClick(View v){
 
                 DataStore strdata = new DataStore();
+
                 //Get Title
-                byte[] Title    = title.getText().toString().getBytes();
-                byte[] Content  = content.getText().toString().getBytes();
                 String notify   = "";
+                String Title    = title.getText().toString();
+                String Content  = content.getText().toString();
+                String save     = Title + "|||" + Content + "\n";
+
+                byte[] write;
                 //Write-in twice Separately , title and content.
                 try {
-                    strdata.saveToFile(Title, "/data/data/com.example.administrator.myapplication/testFile.txt");
-                    strdata.saveToFile(Content, "/data/data/com.example.administrator.myapplication/testFile.txt");
+                    write  = save.getBytes("UTF-8");
+                    strdata.saveToFile(write, Settings.folder+ Settings.label_file);
                     notify = "File Save Succeed.";
                 } catch(Exception e){
                     Log.v(DataActivity.ACTIVITY_TAG,e.toString());

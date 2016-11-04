@@ -21,4 +21,14 @@ public class DataStore{
         fs_1.close();
     }
 
+    public String getFromFile(String filepath) throws IOException{
+
+        byte[] buffer = new byte[1024*4];
+        File testFile = new File(filepath);
+        FileInputStream is_1 = new FileInputStream(testFile);
+        is_1.read(buffer);
+        return new String(buffer, "UTF-8");
+
+    }
+
 }

@@ -1,144 +1,192 @@
 package com.example.administrator.myapplication;
 
 /**
- * Created by wand on 2016/10/27.
+ * Created by wand on 2016/11/3.
+ * Make this class into a powerful
+ * Efficient Reusable WEBSITE Connector
+ * and Requester.
  */
 
-//Import Http Libs.
 import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.io.InputStream;
 import java.net.URL;
-import java.io.*;
-import java.util.List;
-import java.util.Map;
-import android.util.Log;
+
 
 public class Connector {
 
-    public static final String TIME_OUT = "操作超时";
-    public static final String NETWORK_GET = "NETWORK_GET";
-    public static final String NETWORK_POST= "NETWORK_POST";
+    private static String target_url = "";
+    private static String post_data  = "";
 
-    private String username = "";
-    private String password = "";
+    public Connector(String target_url){
 
-    public Connector(String user, String pass){
-
-        //Set User and Pass
-        username = "uname=" + user;
-        password = "upwd=" + pass;
+        //Initialize Target_url and request_method
+        this.target_url = target_url;
+        Log.d("[*]CheckURL ", target_url);
 
     }
 
-    public String HttpLogin(){
+    public String launchGETReq(){
 
-        String res = null;
-        HttpURLConnection conn  = null;
-        String responseBody     = null;
-        String responseHeader   = null;
-        //URL Package Method.
+        HttpURLConnection conn = null;
         try {
-            URL target_url = new URL(Settings.login_url);
-            //Open a url connection.
-            conn = (HttpURLConnection)target_url.openConnection();
-            conn.setRequestMethod("POST");
-            //Open Requester in explicit-mode.
-            conn.setDoOutput(true);
-            conn.connect();
-            //String requestHeader = getRequestHeader(conn);
-            OutputStream os = conn.getOutputStream();
-            byte[] requestBody = new String(username + "&" + password).getBytes("UTF-8");
-            //Write Http-Request Body into OutputStream and send.
-            os.write(requestBody);
-            os.flush();
-            os.close();
-            //Connection data returned here.
-            InputStream is = conn.getInputStream();
-            responseBody     = getStringByBytes(getBytesByInputStream(is));
-            responseHeader   = getResponseHeader(conn);
+            URL url = new URL(target_url);
+            //Cast url.openConnection into HttpURLConnection:
+            //When Open Connection
+            //There will be added a http header ahead.
+            conn = (HttpURLConnection) url.openConnection();
+            //StatusCode Checker:
+            /*
+            int status_code = conn.getResponseCode();
+            if (status_code == 200){
+                //Req OK
+                //Acuqire InputStream of connector.
+                InputStream is =  conn.getInputStream();
+                return readHTTPStream(is);
+            }else{
+
+                //Req with problem:
+                Log.d("[*]STATUSCODEERROR: " , ""+status_code);
+                return "";
+            }
+            */
+
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            return readHTTPStream(in);
 
         }catch(Exception e){
-            e.printStackTrace();
-            return "Connection to Server Error.";
-        }
-        finally{
-            if(conn!=null)
-                conn.disconnect();
-            return responseBody;
+            Log.d("[*]HTTPREQERROR: " , e.toString());
+            return "";
+        }finally{
+            conn.disconnect();
         }
 
     }
 
-    public String getResponseHeader(HttpURLConnection conn) {
-        Map<String, List<String>> responseHeaderMap = conn.getHeaderFields();
-        int size = responseHeaderMap.size();
-        StringBuilder sbResponseHeader = new StringBuilder();
-        for(int i = 0; i < size; i++){
-            String responseHeaderKey = conn.getHeaderFieldKey(i);
-            String responseHeaderValue = conn.getHeaderField(i);
-            sbResponseHeader.append(responseHeaderKey);
-            sbResponseHeader.append(":");
-            sbResponseHeader.append(responseHeaderValue);
-            sbResponseHeader.append("\n");
+    public String launchPOSTReq(String data){
+
+        //Data-Pattern is:
+        //data1=a&data2=b&data3=c etc.
+        HttpURLConnection conn = null;
+        try{
+            URL url = new URL(this.target_url);
+            conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            byte[] reqBody = new String(data).getBytes("UTF-8");
+
+            //conn.setChunkedStreamingMode(0);
+            //Write Request Body into BufferedOutputStream
+            OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+            writeStream(out, reqBody);
+
+            //Acquire Acks.
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            return readHTTPStream(in);
+            //return readHTTPStream(is);
+        }catch(Exception e) {
+            Log.d("[*] PostFailed", e.toString());
+            return "";
+        }finally{
+            conn.disconnect();
         }
-        return sbResponseHeader.toString();
     }
 
-    public byte[] getBytesByInputStream(InputStream is) {
-        byte[] bytes = null;
-        BufferedInputStream bis = new BufferedInputStream(is);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BufferedOutputStream bos = new BufferedOutputStream(baos);
-        byte[] buffer = new byte[1024 * 8];
-        int length = 0;
-        try {
-            //Read till finish in.
-            while ((length = bis.read(buffer)) > 0) {
-                bos.write(buffer, 0, length);
-            }
-            bos.flush();
-            bytes = baos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                bis.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public String uploadFile(byte[] filecontent){
 
-        return bytes;
+        HttpURLConnection conn = null;
+        try{
+            URL url = new URL(this.target_url);
+            conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+
+            //conn.setChunkedStreamingMode(0);
+            //Write Request Body into BufferedOutputStream
+            OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+            writeStream(out, filecontent);
+
+            //Acquire Acks.
+            InputStream in = new BufferedInputStream(conn.getInputStream());
+            return readHTTPStream(in);
+            //return readHTTPStream(is);
+        }catch(Exception e) {
+            Log.d("[*] PostFailed", e.toString());
+            return "";
+        }finally{
+            conn.disconnect();
+        }
     }
 
-    public String getStringByBytes(byte[] bytes) {
+
+    public String readHTTPStream(InputStream is){
+
+        byte[] res_bytes = null;
+        BufferedInputStream bufferedis    = new BufferedInputStream(is);
+        ByteArrayOutputStream byteArrayos = new ByteArrayOutputStream();
+        BufferedOutputStream bufferedos   = new BufferedOutputStream(byteArrayos);
+        byte[] buffer = new byte[1024 * 16];
+        int length    = 0;
+        try{
+
+            //Get Materials from one InputStream: bufferedis
+            while((length = bufferedis.read(buffer)) > 0){
+                //EveryTime Got FROM length-byte from buffer
+                //Write them into bufferedos
+                bufferedos.write(buffer, 0, length);
+            }
+            //Whole NetWork-Packet is inside bufferedos and byteArrayos.
+            //Flush them out now.
+            bufferedos.flush();
+            res_bytes = byteArrayos.toByteArray();
+            return getStringWithBytes(res_bytes);
+
+        }catch(Exception e){
+
+            Log.d("[*]READINGBUFFERERROR", e.toString());
+            return "";
+
+        }finally{
+            //Trying to close bufferedos
+            try{
+                bufferedos.close();
+            }catch(Exception e){
+                Log.d("[*]CLOSEBUFFERERROR", e.toString());
+            }
+            try{
+                bufferedis.close();
+            }catch(Exception e){
+                Log.d("[*]CLOSEBUFFERERROR", e.toString());
+            }
+        }
+    }
+
+    public String getStringWithBytes(byte[] bytes){
+
         String str = "";
-        try {
+        try{
             str = new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        }catch(Exception e){
+            Log.d("[*]BYTETOSTRINGERROR", e.toString());
         }
         return str;
     }
 
-    public boolean Check_login(){
+    public void setTarget_url(String url){
 
-        String ret = HttpLogin();
-        ret = ret.trim();
-        if(ret.equals("OK")){
-            Log.d("Ret-MSG",ret);
-            return true;
-        }
-        else{
-            return false;
-        }
+        this.target_url = url;
     }
 
+    public void writeStream(OutputStream out,byte[] reqBody) throws IOException{
+
+        out.write(reqBody);
+        out.flush();
+        out.close();
+    }
 }
