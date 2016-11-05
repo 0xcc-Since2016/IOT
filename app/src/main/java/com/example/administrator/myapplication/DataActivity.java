@@ -43,10 +43,11 @@ public class DataActivity extends AppCompatActivity {
         content = (EditText) findViewById(R.id.content);
         title = (EditText) findViewById((R.id.title));
 
-
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         title.setText(bundle.getString("title"));
+        content.setText(bundle.getString("content"));
+
         if(bundle.getString("date")==null){
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             String d = format.format(new Date());
@@ -111,7 +112,11 @@ public class DataActivity extends AppCompatActivity {
                 String notify   = "";
                 String Title    = title.getText().toString();
                 String Content  = content.getText().toString();
-                String save     = Title + "|||" + Content + "\n";
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+                String date     = format.format(new Date());
+
+                String save     = Title + "|||" + Content + "|||" + date + "\n";
 
                 byte[] write;
                 //Write-in twice Separately , title and content.
@@ -134,12 +139,14 @@ public class DataActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         String text = title.getText().toString();
+        String conTent = content.getText().toString();
         if(!text.isEmpty()){
             Intent intent = getIntent();
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
             String d = format.format(new Date());
             intent.putExtra("date",format.format(new Date()));
             intent.putExtra("title",text);
+            intent.putExtra("content",conTent);
             setResult(RESULT_OK,intent);
         }
         finish();

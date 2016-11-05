@@ -11,6 +11,7 @@ import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.menu.MenuView;
 import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,8 +32,10 @@ import android.os.StrictMode;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog dialog_login;
     AlertDialog dialog_register;
     ProgressDialog dialog_progress;
+    String username = "";
 
     public final String TAG = MainActivity.class.getSimpleName();
 
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 showProgressDialog("正在登录...");
 
                 //Init Request thread
+                username = Username.getText().toString();
                 HttpLoginThread login = new HttpLoginThread(Username.getText().toString(),
                                                             Password.getText().toString(),
                                                             Settings.login_url,
@@ -91,15 +96,15 @@ public class MainActivity extends AppCompatActivity {
         //INIT init thread
         InitThread Initth = new InitThread();
         Initth.start();
-
+        //FileUpload thread
 
         listView = (ListView) findViewById(R.id.item_list);
         mapList = new ArrayList<Map<String, Object>>();
         btn_add = (Button) findViewById(R.id.add_but);
 
 
-        adapter = new SimpleAdapter(this,mapList,R.layout.item_layout,new String[]{"title","date","content"},
-                new int[]{R.id.title,R.id.date,R.id.content});
+        adapter = new SimpleAdapter(this,mapList,R.layout.item_layout,new String[]{"title","date"},
+                new int[]{R.id.title,R.id.date});
 
         listView.setAdapter(adapter);
 
@@ -108,12 +113,15 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(),DataActivity.class);
                 TextView title = (TextView) view.findViewById(R.id.title);
-                TextView content = (TextView) view.findViewById(R.id.content);
                 intent.putExtra("position",position);
                 intent.putExtra("title",title.getText().toString());
+                //GetFrom DataActivity
+                //
+                intent.putExtra("content", mapList.get((int)id).get("content").toString());
                 intent.putExtra("resource_id",id);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                Log.d(TAG, "onItemClick:     "+id);
+                Log.d(TAG, "onItemClick: " + id);
+                Log.d(TAG, "POSITION: " + position);
                 startActivityForResult(intent,0);
             }
         });
@@ -133,11 +141,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 //Adding Data, drag to dataActivity.
+                //Establish new Activity:
+                //new Intent from Original to Child.
                 Intent intent = new Intent(getApplicationContext(),DataActivity.class);
                 intent.putExtra("position",-1);
                 startActivityForResult(intent,0);
             }
         });
+
+        this.initListView();
     }
 
     void showProgressDialog(String message){
@@ -204,14 +216,17 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
         dialog_register.show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+
         getMenuInflater().inflate(R.menu.main,menu);
+//        MenuView.ItemView uploadItem = (MenuView.ItemView)menu.findItem(R.id.backup);
         return super.onCreateOptionsMenu(menu);
+
     }
 
     @Override
@@ -232,6 +247,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).show();
 
+            case R.id.backup:
+
+                Toast.makeText(getApplicationContext(), "Uploading Files...", Toast.LENGTH_SHORT).show();
+                DataStore dtst = new DataStore();
+                try {
+                    InstantUpload instantup = new InstantUpload(username, Settings.label_file,Settings.folder + Settings.label_file);
+                    instantup.start();
+                }catch(Exception e){
+                    Log.d("[*]FILEUPLOADERROR", e.toString());
+                }
+
             case R.id.log_out:
                 //to logout
         }
@@ -245,13 +271,12 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 if(resultCode==RESULT_OK){
                     Bundle bundle = data.getExtras();
-                    updateView(bundle.getInt("position"),bundle.getString("title"),bundle.getString("date"));
+                    updateView(bundle.getInt("position"),bundle.getString("title"),bundle.getString("date"), bundle.getString("content"));
                 }
         }
     }
 
-
-    private void updateView(int position,String new_title,String new_date){
+    private void updateView(int position,String new_title,String new_date, String new_content){
 
         Map<String,Object> map;
         if(position!=-1)
@@ -260,10 +285,70 @@ public class MainActivity extends AppCompatActivity {
             map = new HashMap<String, Object>();
         map.put("title",new_title);
         map.put("date",new_date);
+        map.put("content", new_content);
         mapList.add(0,map);
+        printOutMapList(mapList);
+        DataStore StoreData = new DataStore();
+        try {
+
+            String fileContent = StoreData.getFromFile(Settings.folder + Settings.label_file);
+            Log.d("[*]LABELFILECONTENT", fileContent);
+
+        }catch (Exception e){
+            Log.d("[*]READFILEERROR", e.toString());
+        }
+
         adapter.notifyDataSetChanged();
 
     }
+
+    public void initListView(){
+
+        try {
+
+            DataStore StoreData = new DataStore();
+            String fileContent = StoreData.getFromFile(Settings.folder + Settings.label_file);
+            Log.d("[*]FILECONTENT", fileContent);
+            String[] res      = fileContent.split("\n");
+            for(int i=0; i < res.length; i++){
+
+                String temp       = res[i];
+                String[] res_temp = temp.split("\\|\\|\\|");
+
+                Log.d("[*]VALUES" , res_temp.toString());
+                String title      = res_temp[0];
+                String content    = res_temp[1];
+                String date       = res_temp[2];
+                Log.d("[*]VALUES" , title + "," + content + "," + date);
+                Map<String,Object> map = new HashMap<String, Object>();
+                map.put("title",   title);
+                map.put("date",    date);
+                map.put("content", content);
+                mapList.add(0,map);
+            }
+            adapter.notifyDataSetChanged();
+        }catch(Exception e){
+            Log.d("[*]ERRORREADLABELFILE", e.toString());
+        }
+    }
+
+
+    //Debug Method
+    public void printOutMapList(List mapList){
+
+        Iterator it = mapList.iterator();
+        while(it.hasNext()){
+
+            Map<String,Object> tempmap = (Map<String, Object>) it.next();
+            Log.d("[*]MapList", tempmap.get("title").toString());
+            Log.d("[*]MapList", tempmap.get("content").toString());
+            Log.d("[*]MapList", tempmap.get("date").toString());
+            Log.d("[*]NextOne", "\n");
+
+        }
+
+    }
+
 
     private void delete_item(){
         new AlertDialog.Builder(this).setTitle("Are you 确定").setMessage("是否删除这个项目？").setPositiveButton("删除", new DialogInterface.OnClickListener() {
@@ -350,6 +435,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Login Succeed.", Toast.LENGTH_SHORT).show();
                     dialog_progress.hide();
                     dialog_login.hide();
+                    FileUpload flupload = new FileUpload(username);
+                    flupload.start();
 
             }
             else if(server_res.equals("Error")){
@@ -360,4 +447,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+    @Override
+    protected  void onStop(){
+
+        //KeepData locally.
+        super.onStop();
+        String res = "";
+        for(int i = 0 ; i < mapList.size(); i++){
+
+            Map<String,Object>  map = mapList.get(i);
+            String piece = map.get("title") + "|||" +
+                           map.get("content") + "|||" +
+                           map.get("date")      + "\n";
+
+            res += piece;
+        }
+
+        DataStore dataStore = new DataStore();
+        try {
+            dataStore.flushToFile(res.getBytes("UTF-8"), Settings.folder + Settings.label_file);
+        }catch(Exception e){
+            Log.d("[*]SAVETOFILEERROR", e.toString());
+        }
+    }
 }

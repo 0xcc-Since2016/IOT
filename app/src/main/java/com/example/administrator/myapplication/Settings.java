@@ -14,7 +14,7 @@ public class Settings {
     //Basic Settings
     public static String folder         = "/data/data/com.example.administrator.myapplication";
     public static String label_file     = "/Label.txt";
-    public static String Server_ip      = "192.168.191.2";
+    public static String Server_ip      = "116.56.129.17";
     public static int    Server_port    = 3000; //Server Listen port 3000 by Default.
 
     //Folder Names
@@ -51,5 +51,9 @@ public class Settings {
     public static String defaultMethod  = "POST";
     public static String register_url   = "http://" + Server_ip + ":" + Server_port + "/register";
     public static String upload_url     = "http://" + Server_ip + ":" + Server_port + "/uploaded";
+
+    //Communication Settings
+    public static final String fileSeparator  = "------------------ccapnet77059";
+    public static final String endofline= "--" + fileSeparator + "--\r\n";
 
 }

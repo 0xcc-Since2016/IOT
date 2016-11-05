@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Set;
 
 
 public class Connector {
@@ -58,7 +59,8 @@ public class Connector {
             */
 
             InputStream in = new BufferedInputStream(conn.getInputStream());
-            return readHTTPStream(in);
+            return Utils.readStream(1024*16,in);
+
 
         }catch(Exception e){
             Log.d("[*]HTTPREQERROR: " , e.toString());
@@ -88,8 +90,9 @@ public class Connector {
 
             //Acquire Acks.
             InputStream in = new BufferedInputStream(conn.getInputStream());
-            return readHTTPStream(in);
+            return Utils.readStream(1024*16, in);
             //return readHTTPStream(is);
+
         }catch(Exception e) {
             Log.d("[*] PostFailed", e.toString());
             return "";
@@ -98,23 +101,45 @@ public class Connector {
         }
     }
 
-    public String uploadFile(byte[] filecontent){
+    public String uploadFile(String usrname, String filename , String filetype , int filelength,  byte[] filecontent){
 
         HttpURLConnection conn = null;
         try{
+
+            //Init Line of upload part
+            String fileheader  = "--" + Settings.fileSeparator + "\r\n";
+            fileheader += "Content-Disposition: form-data; name=\"uploaded\"; filename=\"" +
+            filename + "." + filetype + "\"" + "\r\n" + "Content-Type: application/" + filetype + "\r\n\r\n";
+            byte[] contentHeader = fileheader.getBytes("UTF-8");
+            byte[] contentEnder  = Settings.endofline.getBytes("UTF-8");
+
+            filelength += contentHeader.length;
+            filelength += contentEnder.length ;
+            filelength += "\r\n".getBytes("UTF-8").length;
+
             URL url = new URL(this.target_url);
             conn = (HttpURLConnection)url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-
+            //-----------------------------
+            //-------------------------------
+            //-------------------------------
+            conn.setRequestProperty("Content-Length", filelength+"");
+            conn.setRequestProperty("Content-Type","multipart/form-data;boundary=" + Settings.fileSeparator);
+            conn.setRequestProperty("AndroidReq", Settings.sec_token);
+            conn.setRequestProperty("username", usrname);
             //conn.setChunkedStreamingMode(0);
             //Write Request Body into BufferedOutputStream
             OutputStream out = new BufferedOutputStream(conn.getOutputStream());
-            writeStream(out, filecontent);
-
+            out.write(contentHeader);
+            out.write(filecontent);
+            out.write("\r\n".getBytes("UTF-8"));
+            out.write(contentEnder);
+            out.flush();
+            out.close();
             //Acquire Acks.
             InputStream in = new BufferedInputStream(conn.getInputStream());
-            return readHTTPStream(in);
+            return Utils.readStream(1024*16,in);
             //return readHTTPStream(is);
         }catch(Exception e) {
             Log.d("[*] PostFailed", e.toString());
@@ -124,59 +149,6 @@ public class Connector {
         }
     }
 
-
-    public String readHTTPStream(InputStream is){
-
-        byte[] res_bytes = null;
-        BufferedInputStream bufferedis    = new BufferedInputStream(is);
-        ByteArrayOutputStream byteArrayos = new ByteArrayOutputStream();
-        BufferedOutputStream bufferedos   = new BufferedOutputStream(byteArrayos);
-        byte[] buffer = new byte[1024 * 16];
-        int length    = 0;
-        try{
-
-            //Get Materials from one InputStream: bufferedis
-            while((length = bufferedis.read(buffer)) > 0){
-                //EveryTime Got FROM length-byte from buffer
-                //Write them into bufferedos
-                bufferedos.write(buffer, 0, length);
-            }
-            //Whole NetWork-Packet is inside bufferedos and byteArrayos.
-            //Flush them out now.
-            bufferedos.flush();
-            res_bytes = byteArrayos.toByteArray();
-            return getStringWithBytes(res_bytes);
-
-        }catch(Exception e){
-
-            Log.d("[*]READINGBUFFERERROR", e.toString());
-            return "";
-
-        }finally{
-            //Trying to close bufferedos
-            try{
-                bufferedos.close();
-            }catch(Exception e){
-                Log.d("[*]CLOSEBUFFERERROR", e.toString());
-            }
-            try{
-                bufferedis.close();
-            }catch(Exception e){
-                Log.d("[*]CLOSEBUFFERERROR", e.toString());
-            }
-        }
-    }
-
-    public String getStringWithBytes(byte[] bytes){
-
-        String str = "";
-        try{
-            str = new String(bytes, "UTF-8");
-        }catch(Exception e){
-            Log.d("[*]BYTETOSTRINGERROR", e.toString());
-        }
-        return str;
-    }
 
     public void setTarget_url(String url){
 
@@ -189,4 +161,7 @@ public class Connector {
         out.flush();
         out.close();
     }
+
+
+
 }
