@@ -116,8 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("position",position);
                 intent.putExtra("title",title.getText().toString());
                 //GetFrom DataActivity
-                //
-                intent.putExtra("content", mapList.get((int)id).get("content").toString());
+                intent.putExtra("content", mapList.get(position).get("content").toString());
                 intent.putExtra("resource_id",id);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 Log.d(TAG, "onItemClick: " + id);
@@ -331,7 +330,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d("[*]ERRORREADLABELFILE", e.toString());
         }
     }
-
 
     //Debug Method
     public void printOutMapList(List mapList){

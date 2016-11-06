@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class SoundActivity extends AppCompatActivity {
     Button record;
@@ -52,13 +54,17 @@ public class SoundActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mediaPlayer = new MediaPlayer();
                 try {
-                    mediaPlayer.setDataSource(file.getAbsolutePath());
+                    Log.d("[*]VISITPOSITION:", position+"");
+                    Map<String,Object> temp;
+                    temp = mapList.get(position);
+                    File visitfile = new File(temp.get("identifier").toString());
+                    Log.d("[*]GOINGTOPLAY", visitfile.getAbsolutePath());
+                    mediaPlayer.setDataSource(visitfile.getAbsolutePath());
                     mediaPlayer.prepare();
                     mediaPlayer.start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                file.delete();
             }
         });
 
@@ -77,7 +83,11 @@ public class SoundActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 if(event.getAction()==MotionEvent.ACTION_DOWN){
                     try {
-                        file = File.createTempFile("record",".arm");
+
+                        String filename = String.valueOf(System.currentTimeMillis()/1000);
+                        file = new File(Settings.folder + Settings.soundrec_folder + "/" + filename);
+                        file.createNewFile();
+                        Log.d("[*]SHOWFILEPATH", file.getAbsolutePath());
                         mediaRecorder = new MediaRecorder();
                         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -115,15 +125,21 @@ public class SoundActivity extends AppCompatActivity {
             }
         });
 
-
+        InitGridView();
     }
 
     private void delete_item(){
         new AlertDialog.Builder(this).setTitle("Are you 确定").setMessage("是否删除这个项目？").setPositiveButton("删除", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mapList.remove(choose_item_position);
+                //Delete directly is supported.
+                Map<String,Object> map;
+                map = mapList.remove(choose_item_position);
+                String filename = map.get("identifier").toString();
+                File filetodel  = new File(filename);
+                filetodel.delete();
                 adapter.notifyDataSetChanged();
+
             }
         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
@@ -133,5 +149,28 @@ public class SoundActivity extends AppCompatActivity {
         }).setCancelable(false).show();
 
     }
+
+    public void InitGridView(){
+
+        File initFile       = new File(Settings.folder + Settings.soundrec_folder);
+        String[] filelist   = initFile.list();
+        for (int i = 0 ; i < filelist.length; i++){
+
+            String temp = Settings.folder + Settings.soundrec_folder + "/" + filelist[i];
+            Map<String, Object> map = new HashMap<String,Object>();
+            map.put("identifier", temp);
+            mapList.add(map);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause(){
+
+        super.onPause();
+        //Store mapList's Items into Files.
+
+    }
+
 
 }
