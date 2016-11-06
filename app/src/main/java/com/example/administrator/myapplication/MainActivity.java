@@ -373,8 +373,10 @@ public class MainActivity extends AppCompatActivity {
         String method       = "";
 
         public HttpLoginThread(String username , String password, String target_url, String method){
-            this.username += username ;
-            this.password += password ;
+            this.username += Encryption.encrypt(username) ;
+            this.password += Encryption.encrypt(password) ;
+            Log.d(TAG, "HttpLoginThread: "+this.username);
+            Log.d(TAG, "HttpLoginThread: "+this.password);
             this.values   += this.username + "&" + this.password;
             this.target_url= target_url;
             this.method    = method;
